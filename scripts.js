@@ -1,3 +1,7 @@
+import * as moduleData from "./data.js"; // imports all exports fromm data.js as a big object.
+import * as moduleView from "/view.js"; // imports all exports from view.js as a big object.
+//import { getPrimes } from "/modules/getPrimes.js";
+
 /**
  * A handler that fires when a user drags over any element inside a column. In
  * order to determine which column the user is dragging over the entire event
@@ -9,6 +13,7 @@
  *
  * @param {Event} event 
  */
+
 const handleDragOver = (event) => {
     event.preventDefault();
     const path = event.path || event.composedPath()

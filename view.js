@@ -43,12 +43,12 @@ export const createOrderHtml = (order) => {
  * Since the tables in use, and their identification can be configured before
  * the start of the app (in data.js), the actual options returned should be
  * dynamically added to the respective "<select>" elements in the HTML after
- * JavaScript loads. This function executes the logic thar reads the current
+ * JavaScript loads. This function executes the logic that reads the current
  * tables and creates the HTML to select them.
  *
  * @returns {HTMLElement}
  */
-const createTableOptionsHtml = () => {
+export const createTableOptionsHtml = () => {
     const fragment = document.createDocumentFragment()
 
     for (const singleTable of TABLES) {
@@ -118,7 +118,7 @@ for (const columnName of COLUMNS) {
 export const updateDraggingHtml = (newDragging) => {
     const { over = state.dragging.over } = newDragging
 
-    for (const columnName of COLUMNS) {
+    for (const columnName of COLUMNS) { // This deals with the column colors becoming green when the item is being hovered over it.
         const value = columnName === over ? 'rgba(0, 160, 70, 0.2)' : ''
         html.area[columnName].style.backgroundColor = value
     }
