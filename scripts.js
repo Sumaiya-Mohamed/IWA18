@@ -1,5 +1,5 @@
-import * as moduleData from "./data.js"; // imports all exports fromm data.js as a big object.
-import * as moduleView from "/view.js"; // imports all exports from view.js as a big object.
+import * as dataFile from "./data.js"; // imports all exports fromm data.js as a big object.
+import * as viewFile from "./view.js"; // imports all exports from view.js as a big object.
 //import { getPrimes } from "/modules/getPrimes.js";
 
 /**
@@ -14,45 +14,116 @@ import * as moduleView from "/view.js"; // imports all exports from view.js as a
  * @param {Event} event 
  */
 
-const handleDragOver = (event) => {
-    event.preventDefault();
-    const path = event.path || event.composedPath()
-    let column = null
+const handleDragStart = (event) => {
+    event.preventDefault(); // This stops the default action the browser has of trying to open it once its clicked so that now it can be dragged.
 
-    for (const element of path) {
-        const { area } = element.dataset
-        if (area) {
+}
+
+
+const handleDragOver = (event) => {
+   handleDragStart()
+   viewFile.updateDraggingHtml()
+    const path = event.path || event.composedPath()
+    /*Gets the lists of elements that the event is being passed through.
+    * So it basically gains access to those elements so that they can be used.
+     */
+    let column = null // Will later be used to show the column the user is currently dragging over.
+
+    for (const element of path) {  //The for loop iterates over the elements the event is passing through.
+
+        const { area } = element.dataset //Used to mark the different columns on the page using the data-attribute values as headings.
+        if (area) { // Checks if the data-area attribute exists for the current element then sets column to its value.
             column = area
             break;
         }
     }
-
+ 
     if (!column) return
     updateDragging({ over: column })
     updateDraggingHtml({ over: column })
 }
 
 
-const handleDragStart = (event) => {}
-const handleDragEnd = (event) => {}
+
+const handleDragEnd = (event) => {
+   event.preventDefault();
+    handleDragOver();
+}
 const handleHelpToggle = (event) => {}
-const handleAddToggle = (event) => {}
-const handleAddSubmit = (event) => {}
-const handleEditToggle = (event) => {}
+
+
+const handleAddToggle = (event) => {
+    viewFile.html.add.overlay.show()
+    event.preventDefault(); 
+   
+    const path = event.path || event.composedPath()
+    let order = null
+    
+    for (const element of path) { // The for loop iterates over the elements the event is passing through.
+
+        const { add } = element.dataset 
+        if (add) { // Checks if the data-add attribute exists for the current element.
+            order = add
+            break;
+        }
+    }
+    
+    // Do something with the order value, such as adding a new item to a list or database.
+    console.log(`Adding new item at order ${order}`);
+    
+    // Reset the form.
+    event.target.reset();
+    
+}
+
+const handleAddSubmit = (event) => {
+    handleAddToggle()
+    event.preventDefault(); // Prevents the page from reloading or going to the next page (default behavior).
+    
+    // Get the submitted item and table values.
+    const item = add.target.item.value;
+    const table = event.target.table.value;
+    
+    
+    const newItem =  document.querySelector('[data-area="ordered"][data-column="ordered"]');
+    newItem.textContent = `New order: ${item} - Table ${table}`;
+    
+    event.target.reset();
+};
+
+
+
+
+const handleEditToggle = (event) => {
+    handleAddToggle()
+    event.preventDefault(); // Prevents the page from reloading or going to the next page (default behavior).
+    
+    // Get the submitted item and table values.
+    const item = add.target.item.value;
+    const table = event.target.table.value;
+    
+    
+    const newItem =  document.querySelector('[data-area="ordered"][data-column="ordered"]');
+    newItem.textContent = `New order: ${item} - Table ${table}`;
+    
+    event.target.reset();
+
+}
 const handleEditSubmit = (event) => {}
 const handleDelete = (event) => {}
 
-html.add.cancel.addEventListener('click', handleAddToggle)
-html.other.add.addEventListener('click', handleAddToggle)
-html.add.form.addEventListener('submit', handleAddSubmit)
 
-html.other.grid.addEventListener('click', handleEditToggle)
-html.edit.cancel.addEventListener('click', handleEditToggle)
-html.edit.form.addEventListener('submit', handleEditSubmit)
-html.edit.delete.addEventListener('click', handleDelete)
+viewFile.html.add.cancel.addEventListener('click', handleAddToggle) //pass the function reference without parenthesis so that the function runs when actual click event occurs.
+viewFile.html.other.add.addEventListener('click', handleAddToggle)
+viewFile.html.add.form.addEventListener('submit', handleAddSubmit)
 
-html.help.cancel.addEventListener('click', handleHelpToggle)
-html.other.help.addEventListener('click', handleHelpToggle)
+viewFile.html.other.grid.addEventListener('click', handleEditToggle)
+viewFile.html.edit.cancel.addEventListener('click', handleEditToggle)
+viewFile.html.edit.form.addEventListener('submit', handleEditSubmit)
+viewFile.html.edit.delete.addEventListener('click', handleDelete)
+
+viewFile.html.help.cancel.addEventListener('click', handleHelpToggle)
+viewFile.html.other.help.addEventListener('click', handleHelpToggle)
 
 for (const htmlColumn of Object.values(html.columns)) {
     htmlColumn.addEventListener('dragstart', handleDragStart)
