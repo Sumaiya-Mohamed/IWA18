@@ -49,12 +49,25 @@ const handleDragEnd = (event) => {
    event.preventDefault();
     handleDragOver();
 }
-const handleHelpToggle = (event) => {}
+
+
+const handleHelpToggle = (event) => {
+    viewFile.html.help.overlay.show()
+    event.preventDefault(); 
+  
+}
+
+
+const handleHelpCancelToggle = (event) => {
+   event.preventDefault(); 
+    viewFile.html.help.overlay.close();
+ };
+
 
 
 const handleAddToggle = (event) => {
     viewFile.html.add.overlay.show()
-    event.preventDefault(); 
+  
    
     const path = event.path || event.composedPath()
     let order = null
@@ -67,62 +80,75 @@ const handleAddToggle = (event) => {
             break;
         }
     }
-    
-    // Do something with the order value, such as adding a new item to a list or database.
-    console.log(`Adding new item at order ${order}`);
+
     
     // Reset the form.
     event.target.reset();
     
 }
 
-const handleAddSubmit = (event) => {
-    handleAddToggle()
-    event.preventDefault(); // Prevents the page from reloading or going to the next page (default behavior).
-    
-    // Get the submitted item and table values.
-    const item = add.target.item.value;
-    const table = event.target.table.value;
-    
-    
-    const newItem =  document.querySelector('[data-area="ordered"][data-column="ordered"]');
-    newItem.textContent = `New order: ${item} - Table ${table}`;
-    
-    event.target.reset();
-};
+//Added a function
+const handleCancelToggle = (event) => {
+    event.preventDefault(); 
+    viewFile.html.add.overlay.close();
+}
 
+const handleAddSubmit = (event) => {  
+    event.preventDefault();
+    const overlay = viewFile.html.add.overlay;
+    const formData = new FormData(event.target);
+    const data = Object.fromEntries(formData.entries()); // Create a new object.
+    const newData = dataFile.createOrderData(data);
+    const htmlData = viewFile.createOrderHtml(newData);
+    const append = document.querySelector('[data-area="ordered"]');
+    event.target.reset();
+    overlay.close();
+    append.appendChild(htmlData);
+ };
 
 
 
 const handleEditToggle = (event) => {
-    handleAddToggle()
+    viewFile.html.edit.overlay.show();
     event.preventDefault(); // Prevents the page from reloading or going to the next page (default behavior).
     
-    // Get the submitted item and table values.
-    const item = add.target.item.value;
-    const table = event.target.table.value;
-    
-    
-    const newItem =  document.querySelector('[data-area="ordered"][data-column="ordered"]');
-    newItem.textContent = `New order: ${item} - Table ${table}`;
-    
-    event.target.reset();
-
 }
-const handleEditSubmit = (event) => {}
-const handleDelete = (event) => {}
+
+const handleEditSubmit = (event) => {
+    event.preventDefault();
+    const overlay = viewFile.html.edit.overlay;
+    const formData = new FormData(event.target);
+    const data = Object.fromEntries(formData.entries()); // Create a new object.
+    const newData = viewFile.moveToColumn(data);
+    const append = document.querySelector('.grid');
+    event.target.reset();
+    overlay.close();
+    append.appendChild(newData);
+  };
+
+  const handleEditClose = (event) => {
+    event.preventDefault();
+    viewFile.html.edit.overlay.close()
+}
+  
 
 
-viewFile.html.add.cancel.addEventListener('click', handleAddToggle) //pass the function reference without parenthesis so that the function runs when actual click event occurs.
+const handleDelete = (event) => {
+    event.preventDefault();
+    viewFile.html.edit.overlay.delete() 
+}
+
+ //pass the function reference without parenthesis so that the function runs when actual click event occurs.
+viewFile.html.add.cancel.addEventListener('click', handleCancelToggle)
 viewFile.html.other.add.addEventListener('click', handleAddToggle)
 viewFile.html.add.form.addEventListener('submit', handleAddSubmit)
 
 viewFile.html.other.grid.addEventListener('click', handleEditToggle)
-viewFile.html.edit.cancel.addEventListener('click', handleEditToggle)
+viewFile.html.edit.cancel.addEventListener('click', handleEditClose)
 viewFile.html.edit.form.addEventListener('submit', handleEditSubmit)
 viewFile.html.edit.delete.addEventListener('click', handleDelete)
 
-viewFile.html.help.cancel.addEventListener('click', handleHelpToggle)
+viewFile.html.help.cancel.addEventListener('click', handleHelpCancelToggle )
 viewFile.html.other.help.addEventListener('click', handleHelpToggle)
 
 for (const htmlColumn of Object.values(html.columns)) {
